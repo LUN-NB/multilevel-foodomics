@@ -1,0 +1,105 @@
+pipeline_version: "4.3.1"
+protocol: global_within_equal_complete_gpu_trial_4gb_fix_5x5
+
+# Resolve paths from project root.
+paths:
+  model_config: configs/tuning/adaptive_phase2_4gb.yaml
+  core_dir: src/cpi_mec
+  splits_dir: reports/splits
+  output_dir: reports/adaptive_pipeline_complete_gpu_trial_5x5
+
+runtime:
+  expected_python_prefix: "3.11"
+  expected_optuna_version: "4.9.0"
+  device: auto
+
+# Complete coarse grid; zero values are ablations.
+search:
+  inner_folds: "1,2,3,4,5"
+  seed_offsets: "0"
+  anchor_values: "0.025,0.05,0.1,0.25,0.5,1,2"
+  graphban_values: "0,0.25,0.5,1,2,4,8"
+  boltz_values: "0,0.125,0.25,0.5,1,2,4"
+  model_batch_size: 32
+
+# The coarse winner defines local bounds; 64 new trials exclude the injected point.
+continuous_tpe:
+  model_batch_size: 10
+  trials: 64
+  startup_trials: 12
+  ei_candidates: 24
+  sampler_seed: 20260725
+  study_name: cpi_mec_dynamic_local_tpe
+
+# Tune and refit each M1 outer fold independently.
+m1:
+  outer_repeats: 5
+  outer_folds: 5
+  seed_offsets: "0"
+  row_chunk_size: 16
+
+# Final uses one all-label five-fold OOF search.
+final_search:
+  split_repeat: 1
+
+final:
+  seed_offsets: "0"
+  final_seed_offset: 9000000
+  row_chunk_size: 16
+
+training:
+  backbone_epochs: 30
+  steps_per_epoch: 100
+  head_epochs: 120
+
+# M1 performance uses strict outer OOF; Final label metrics are descriptive only.
+evaluation:
+  m0_matrix: data/raw/unidock/UniDock_original_scores_matrix.csv
+  labels: data/project/labels/benchmark_labels.csv
+  descriptors: data/curated/reference/rdkit_descriptors_grouped.csv
+  folds: 5
+  repeats: 5
+  seed: 20260711
+  global_top_fraction: 0.05
+  target_top_k: 100
+
+# Verify release modules and rule tests.
+expected_pipeline_hashes:
+  configs/tuning/adaptive_phase2_4gb.yaml: 0f07943c957a4a5270ba4db4504ce25efc0dd0ea4d1bfe41203419f70b3a3b98
+  src/cpi_mec/__init__.py: 8186527686d99d8ca17e3c7820cabf26eb8a97ae774cc1c93e1c742dc2f034d6
+  src/cpi_mec/adaptive_coarse_search.py: 2bb601e5335f6c1a2fe8f21d9dd2ea5336c77e31643dfe4b3390f724ae3e2973
+  src/cpi_mec/adaptive_continuous_search.py: 2606f9673cc218c44511e05b7d3a7467fbb242cf9c96923dc529bd4ccf99f48a
+  src/cpi_mec/adaptive_fast_backbones.py: 6b41edf23c17b7f3ab91ac4844048fcca5f89b88eca272a86e7877b305806bce
+  src/cpi_mec/adaptive_fast_heads.py: b0a6c8f6a31a09b65a9bd3efac0b089f3be9731d9e2d200a7d2e0505a89f8e18
+  src/cpi_mec/adaptive_fast_trials.py: f25796244e138ba43ed63b84e6c96a96080a296371b52d909f2335d4f57372c1
+  src/cpi_mec/adaptive_final.py: 667bcd585fc750bcc000f57764fcccc799b7a8cb09e6ff242b3109ffd981c91d
+  src/cpi_mec/adaptive_fixed_training.py: eb5c69a58c305685eb974f8c3ea5ae459084180737d1c4d29acece5dad2030ed
+  src/cpi_mec/adaptive_metrics.py: 026f82a0536e50f8283c0a3e4964d6a1d8bea4d076d1366577abbac7e2c159a0
+  src/cpi_mec/adaptive_oof.py: 931448b9ac8b397f0648fd9ccdd820a1fe4c21b54d3f309076078e6a24943a0f
+  src/cpi_mec/adaptive_search_common.py: b9d9c297531ed257267cb0063dab9b43bf187e4dca549410bb81fdf9320c5013
+  src/cpi_mec/adaptive_training.py: 6f0ed24ca03a93a66dcd290541b35d7ad98d8e5d4849bc669453aaa7e42b50bc
+  src/cpi_mec/adaptive_workflow.py: 7e83e832f3d203d26de210b8569de47f3b80a56bf625045d8c85b78f291a7005
+  src/cpi_mec/config.py: e4d7dcbb7936e142a64d752d27b4b074b14339d7936026a300a8d715663a3b41
+  src/cpi_mec/evaluation.py: 6b24985f2f456515493d86fe509dce8ca7922e2f54b4691274c63432d5e8edbd
+  src/cpi_mec/models.py: 5858e2451f466dcbcb01ca1b721da1e628601832c275ca779a80ff603ab32032
+  src/cpi_mec/relations.py: eb07c9039f8e6cbdbeb598cc5815d538fb495952af8b7ee7cf460c51ae077506
+  src/cpi_mec/selection.py: b69dd11f6a5f0836e9aef54799ea14c241f80a81e9b16ee407bda6bfcbf5114d
+  src/cpi_mec/splits.py: 36e6e1ee9e17e22e152136c916435c88b2bb287f216f794b95419f60c5d3cf8f
+  src/cpi_mec/training.py: 65999da220ecf6f87c903ff84de5d0ebb27045c01dbebc036bff3477e4f9370e
+  src/cpi_mec/transforms.py: 1efc866cb8cecafd4a921e1841ff1e852bb6ece04a639739a2c4f7cf14f088da
+  src/cpi_mec/validate_adaptive_fast_backbones.py: fb9fe57119658a5e58c64379eb3027ce9ccacad74f7874ebafda7c7c95753e6b
+  src/cpi_mec/validate_adaptive_fast_heads.py: e7b6a9c2c87397e4d62ce1512dc42e577b5a096406636ebbdbca9cd2e4f77194
+  src/cpi_mec/validate_adaptive_trial_batch.py: fe1dec09b1c18b12642f9443cade487f95ddb64447189245996d983afbb57d8a
+  src/tests/test_adaptive_search.py: 8bbef06c9277e3a6f57c2615c07c5ffd689d7c07a9c08e71786a29bcaffb1485
+
+expected_split_hashes:
+  outer_assignments.csv: ad486d4c7d2ba9e3b00fbc3a0575304b09008ef7bd16ad7aefca6d09f2cfe68c
+  inner_assignments.csv: 238f370f5b693f9dd36d77bc462d8b44264b37ee23d9cba440109f466229b2a8
+  domain_assignments.csv: 0b10013a306e61d3da3d1b352e7c58d785523032dbfa5a3967640cd5bcc2314b
+
+expected_input_hashes:
+  data/raw/unidock/UniDock_original_scores_matrix.csv: 6650fd1e7ada3eb9cc6b8e3d5695645c02d8bba23d04d5ad8197a471a8a7d8b9
+  data/curated/matrices/graphban/graphban_mean_aligned_probability_matrix.csv: 43d371c9c3314c8be03134b7ec63931434c35dc5e6a8e20f5acfdfe62b34437a
+  data/curated/target_priors/external_target_priors_all_sources.csv: d80c088cdc31195097e1912f25669be32b6b60f8cdadf5714f80c4cbf427789e
+  data/project/labels/benchmark_labels.csv: ccfb5c4dc452ada0458258aa1db9129bee548ec011120a44543de83c3653f14b
+  data/curated/reference/rdkit_descriptors_grouped.csv: e9c5f8bb05ba7b3c94ab003eff5ffa4d0dc8b6ee99700b735aa9c2dd003a2de4

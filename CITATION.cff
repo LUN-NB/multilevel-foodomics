@@ -1,0 +1,6 @@
+cff-version: "1.2.0"
+title: Multilevel Foodomics
+type: software
+message: "Please cite Multilevel Foodomics and identify the commit used."
+authors:
+  - name: Multilevel Foodomics

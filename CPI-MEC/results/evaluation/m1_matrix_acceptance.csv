@@ -1,0 +1,7 @@
+check,passed,value
+selected_outer_folds,True,25
+model_fit_count,True,25
+pre_z_shape,True,"(465, 7147)"
+pre_z_finite,True,3323355
+row_z_finite,True,3323355
+strict_oof_count_per_label,True,5..5

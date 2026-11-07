@@ -1,0 +1,6 @@
+"Metric","Value"
+"clValid-selected K","2"
+"Leiden partition sizes","245/220"
+"Selected Leiden resolution","0.15"
+"Cross-method ARI at selected K","0.237"
+"Leiden agreement with reference algorithms","0.129"

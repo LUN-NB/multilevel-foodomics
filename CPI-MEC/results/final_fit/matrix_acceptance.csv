@@ -1,0 +1,8 @@
+check,passed,value
+training_used_all_labels,True,899/899
+pre_z_shape,True,"(465, 7147)"
+pre_z_finite,True,3323355
+row_z_shape,True,"(465, 7147)"
+row_z_finite,True,3323355
+row_z_mean,True,7.472472418612597e-09
+row_z_population_sd,True,5.960464477539063e-08

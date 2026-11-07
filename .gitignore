@@ -1,0 +1,16 @@
+# Local environments and caches
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.Rhistory
+.RData
+.Rproj.user/
+.env
+.env.*
+.DS_Store
+Thumbs.db
+
+# New runs write here. Frozen assets are stored separately.
+/CPI-MEC/reports/adaptive_pipeline_complete_gpu_trial_5x5/
+/Atlas-Structure/runs/

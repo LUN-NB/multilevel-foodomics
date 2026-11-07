@@ -1,0 +1,11 @@
+# Python 3.11
+# Install torch 2.7.1 separately for the chosen backend.
+# The formal run recorded torch 2.7.1+cu118.
+numpy==2.4.6
+pandas==3.0.3
+scikit-learn==1.9.0
+optuna==4.9.0
+PyYAML==6.0.3
+# Direct metric imports. Versions observed in the verification environment.
+scipy==1.17.1
+rdkit==2026.3.1

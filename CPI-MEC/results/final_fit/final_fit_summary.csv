@@ -1,0 +1,2 @@
+seed_offset,joint_seed,head_seed,anchor_weight,graphban_weight,boltz_weight,n_training_labels,backbone_epochs_completed,backbone_selected_epoch,head_epochs_completed,primary_coefficient
+0,29260716,29265716,0.012714280868783,5.737352906115883,0.1712569647848021,899,30,30,120,0.8619279861450195

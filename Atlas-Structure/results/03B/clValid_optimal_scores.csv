@@ -1,0 +1,8 @@
+"Score","Method","Clusters","Validation_index"
+0.0321292097265401,"kmeans",2,"APN"
+31.5399428132006,"kmeans",8,"AD"
+1.04346031960086,"kmeans",2,"ADM"
+4.35726338229739,"kmeans",8,"FOM"
+70.7809523809524,"hierarchical",2,"Connectivity"
+0.152062958681408,"hierarchical",2,"Dunn"
+0.254336657442791,"kmeans",2,"Silhouette"

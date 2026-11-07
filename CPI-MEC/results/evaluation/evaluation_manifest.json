@@ -1,0 +1,72 @@
+{
+  "created_utc": "2026-08-01T07:33:28.141488+00:00",
+  "module": "adaptive_metrics.py",
+  "module_version": "2.0.2",
+  "matrices": {
+    "M0": "CoBiDock-Landscape/data/raw/unidock/UniDock_original_scores_matrix.csv",
+    "M1": "CoBiDock-Landscape/reports/adaptive_pipeline_complete_gpu_trial_5x5/02_m1_matrix/M1_nested_CV_ensemble_preZ_matrix.csv",
+    "Final": "CoBiDock-Landscape/reports/adaptive_pipeline_complete_gpu_trial_5x5/04_final_matrix/Final_full_label_fit_preZ_matrix.csv"
+  },
+  "labels": "CoBiDock-Landscape/data/project/labels/benchmark_labels.csv",
+  "m1_oof_summary": "CoBiDock-Landscape/reports/adaptive_pipeline_complete_gpu_trial_5x5/02_m1_matrix/outer_label_oof_metric_summary.csv",
+  "descriptors": "CoBiDock-Landscape/data/curated/reference/rdkit_descriptors_grouped.csv",
+  "features": [
+    "HeavyAtomCount",
+    "MolLogP",
+    "TPSA",
+    "RotatableBonds"
+  ],
+  "physicochemical_cv": {
+    "folds": 5,
+    "repeats": 5,
+    "seed": 20260711,
+    "grouping_variable": "group_id",
+    "negative_cv_r2": "retained"
+  },
+  "global_top_fraction": 0.05,
+  "target_top_k": 100,
+  "score_direction": {
+    "M0": "lower_is_better",
+    "M1": "lower_is_better",
+    "Final": "lower_is_better"
+  },
+  "comparison_domain": "intersection_of_all_matrix_cids_and_proteins",
+  "n_common_cid": 465,
+  "n_common_gene": 7147,
+  "n_labels_input": 903,
+  "n_labels_in_common_domain": 899,
+  "missing_value_policy": "compound_row_mean",
+  "unlabelled_pairs": "ranked_but_not_treated_as_negative",
+  "performance_policy": {
+    "M0": "direct unadapted matrix baseline",
+    "M1": "strict nested outer-OOF predictions",
+    "Final": "descriptive full-label fit; no generalization claim"
+  },
+  "tie_break": "stable_matrix_row_major_order",
+  "bedroc_alpha": 20.0,
+  "excluded": [
+    "cluster_bias",
+    "continuous_axis_bias",
+    "branch_bias"
+  ],
+  "outputs": [
+    "proteinwise_cv_r2_by_repeat.csv",
+    "physicochemical_bias_by_repeat.csv",
+    "physicochemical_bias_summary.csv",
+    "fold_assignments.csv",
+    "matrix_audit.csv",
+    "cpi_ranking_metrics_summary.csv",
+    "cpi_ranking_metrics_matrix_descriptive.csv",
+    "labelled_pair_scores.csv",
+    "within_compound_metrics.csv",
+    "supplementary_global_metrics.csv",
+    "supplementary_within_compound_metrics.csv",
+    "target_retrieval_by_cid.csv",
+    "physicochemical_spearman.csv",
+    "physicochemical_composition_cv_r2.csv",
+    "global_top_protein_concentration.csv",
+    "labelled_pair_rank_details.csv",
+    "matrix_stability_vs_M0.csv",
+    "all_metrics_summary.csv"
+  ]
+}

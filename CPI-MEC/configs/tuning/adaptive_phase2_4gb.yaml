@@ -1,0 +1,318 @@
+config_version: "2.2-dev"
+protocol: adaptive_phase2_4gb_dev
+
+# Resolve relative paths from the project root.
+path_base: ../..
+
+# Input names describe mathematical roles. Each contract maps the actual columns.
+# Input names describe mathematical roles only; contracts map instance-specific columns.
+inputs:
+  primary_relation_matrix:
+    path: data/raw/unidock/UniDock_original_scores_matrix.csv
+    contract:
+      kind: matrix
+      entity_a_column: cid
+      values:
+        type: numeric
+        allow_missing: true
+
+  dense_auxiliary_relation_matrix:
+    path: data/curated/matrices/graphban/graphban_mean_aligned_probability_matrix.csv
+    contract:
+      kind: matrix
+      entity_a_column: cid
+      values:
+        type: numeric
+        allow_missing: false
+        minimum: 0.0
+        maximum: 1.0
+
+  sparse_relation_strength_matrix:
+    path: data/curated/matrices/sparse_relations/relation_strength_matrix.csv
+    contract:
+      kind: matrix
+      entity_a_column: cid
+      values:
+        type: numeric
+        allow_missing: true
+
+  sparse_relation_confidence_matrix:
+    path: data/curated/matrices/sparse_relations/relation_confidence_matrix.csv
+    contract:
+      kind: matrix
+      entity_a_column: cid
+      values:
+        type: numeric
+        allow_missing: true
+        minimum: 0.0
+        maximum: 1.0
+
+  observed_positive_relations:
+    path: data/curated/target_priors/external_target_priors_all_sources.csv
+    contract:
+      kind: pair_table
+      entity_a_column: cid
+      entity_b_column: gene
+      required_columns:
+        - source
+        - probability
+      unique_by:
+        - cid
+        - gene
+        - source
+      columns:
+        source:
+          type: string
+          allow_missing: false
+          allow_empty: false
+        probability:
+          type: numeric
+          allow_missing: true
+          minimum: 0.0
+          maximum: 1.0
+
+  observed_binary_relations:
+    path: data/project/labels/benchmark_labels.csv
+    contract:
+      kind: pair_table
+      entity_a_column: cid
+      entity_b_column: gene
+      required_columns:
+        - Y
+        - group_id
+      unique_by:
+        - cid
+        - gene
+      columns:
+        Y:
+          type: binary
+          allow_missing: false
+          values:
+            - 0
+            - 1
+        group_id:
+          type: string
+          allow_missing: false
+          allow_empty: false
+
+  entity_a_attributes:
+    path: data/curated/reference/rdkit_descriptors_grouped.csv
+    contract:
+      kind: entity_table
+      entity_a_column: cid
+      required_columns:
+        - group_id
+        - HeavyAtomCount
+        - MolLogP
+        - TPSA
+        - RotatableBonds
+      unique_by:
+        - cid
+      columns:
+        group_id:
+          type: string
+          allow_missing: false
+          allow_empty: false
+        HeavyAtomCount:
+          type: numeric
+          allow_missing: false
+          minimum: 0.0
+        MolLogP:
+          type: numeric
+          allow_missing: false
+        TPSA:
+          type: numeric
+          allow_missing: false
+          minimum: 0.0
+        RotatableBonds:
+          type: numeric
+          allow_missing: false
+          minimum: 0.0
+
+# Axis relations constrain the sets of entity identifiers.
+# Axis rules describe set constraints without assigning biological identities.
+axis_constraints:
+  - subset: dense_auxiliary_relation_matrix
+    superset: primary_relation_matrix
+    axes:
+      - entity_a
+      - entity_b
+  - subset: sparse_relation_strength_matrix
+    superset: dense_auxiliary_relation_matrix
+    axes:
+      - entity_a
+      - entity_b
+  - subset: dense_auxiliary_relation_matrix
+    superset: sparse_relation_strength_matrix
+    axes:
+      - entity_a
+      - entity_b
+  - subset: sparse_relation_confidence_matrix
+    superset: sparse_relation_strength_matrix
+    axes:
+      - entity_a
+      - entity_b
+  - subset: sparse_relation_strength_matrix
+    superset: sparse_relation_confidence_matrix
+    axes:
+      - entity_a
+      - entity_b
+
+# The aligned dense auxiliary matrix defines the analysis domain.
+# The aligned dense auxiliary matrix defines the formal analysis domain.
+domains:
+  formal_domain:
+    from: dense_auxiliary_relation_matrix
+
+# Coverage reports mappings and allows records outside the domain.
+# Coverage reports mapping results; out-of-domain records are not format errors.
+coverage:
+  - input: primary_relation_matrix
+    domain: formal_domain
+  - input: sparse_relation_strength_matrix
+    domain: formal_domain
+  - input: sparse_relation_confidence_matrix
+    domain: formal_domain
+  - input: observed_positive_relations
+    domain: formal_domain
+  - input: observed_binary_relations
+    domain: formal_domain
+  - input: entity_a_attributes
+    domain: formal_domain
+
+# Transform names describe numerical views. Declare each score direction explicitly.
+# Transform names describe model-facing numeric views; direction is always explicit.
+transforms:
+  primary_strength:
+    input: primary_relation_matrix
+    input_direction: lower_is_better
+    missing: row_mean
+    operation: row_percentile
+
+  dense_auxiliary_strength:
+    input: dense_auxiliary_relation_matrix
+    input_direction: higher_is_better
+    missing: preserve
+    operation: row_percentile
+
+  sparse_relation_strength:
+    input: sparse_relation_strength_matrix
+    input_direction: lower_is_better
+    missing: preserve
+    operation: identity
+
+  sparse_relation_confidence:
+    input: sparse_relation_confidence_matrix
+    input_direction: higher_is_better
+    missing: preserve
+    operation: identity
+
+# Parameters for the current frozen run.
+model:
+  # The architecture references the input and transform names declared above.
+  # The architecture references only inputs and transforms declared above.
+  architecture:
+    primary_score:
+      input: primary_relation_matrix
+      direction: lower_is_better
+      coefficient_bounds:
+        - 0.0
+        - 1.0
+
+    backbone_relations:
+      primary_strength:
+        output: identity
+      dense_auxiliary_strength:
+        output: identity
+      sparse_relation_confidence:
+        output: sigmoid
+
+    pair_features:
+      primary: primary_strength
+      auxiliary: dense_auxiliary_strength
+      sparse:
+        - sparse_relation_confidence
+
+  embedding_dim: 32
+  dense_batch_size: 8192
+  sparse_batch_size: 512
+  steps_per_epoch: 100
+  dense_pretrain_epochs: 30
+  pretrain_learning_rate: 0.001
+  pretrain_sparse_weight: 0.25
+  pretrain_weight_decay: 0.00001
+  feature_sample_size: 200000
+  anchor_sample_size: 200000
+  anchor_train_fraction: 0.8
+  anchor_batch_size: 8192
+  positive_relation_weight: 1.0
+  unobserved_pair_ratio: 4
+  positive_relation_batch_size: 2048
+  relation_ranking_temperature: 1.0
+  head_hidden_dim: 32
+  head_epochs: 120
+  head_learning_rate: 0.002
+  head_weight_decay: 0.0
+  ranking_temperature: 1.0
+  ranking_weight: 1.0
+  pointwise_weight: 0.1
+  score_chunk_entity_a: 16
+  seed: 20260716
+
+# Fix the primary task weight at 1 and learn relative auxiliary weights.
+# The primary task remains fixed at 1; only auxiliary-task weights are learned.
+adaptive_weights:
+  backbone:
+    enabled: true
+    lower_bound: 0.05
+    upper_bound: 4.0
+    initial_weights:
+      dense_auxiliary_strength: 1.0
+      sparse_relation_confidence: 0.25
+
+  head:
+    enabled: true
+    lower_bound: 0.01
+    upper_bound: 4.0
+    initial_weights:
+      pointwise: 0.1
+      positive_relation: 1.0
+
+# The training layer declares relation semantics. selection.py selects candidates.
+# The training layer declares relation semantics only; selection.py chooses candidates.
+training:
+  binary_supervision:
+    input: observed_binary_relations
+    label: Y
+    base_transform: primary_strength
+
+  positive_only_supervision:
+    input: observed_positive_relations
+    group: source
+    confidence: probability
+    missing_confidence: 1.0
+    source_seed_offsets:
+      SwissTargetPrediction: 201
+      TCMSP: 202
+
+cross_validation:
+  outer_repeats: 10
+  outer_folds: 5
+  seed: 20260715
+  grouping:
+    input: entity_a_attributes
+    column: group_id
+
+selection:
+  residual_anchor_weight: 0.1
+  objective: global_within_equal_skill
+  rule: exact_best
+  require_context_fingerprint: true
+  final_candidate: learned_coefficient
+
+# Formal three-parameter search objective.
+adaptive_parameter_search:
+  global_skill: "(pooled_AUPRC - prevalence) / (1 - prevalence)"
+  within_skill: "1 - CID_equal_pairwise_logistic_loss / ln(2)"
+  objective: "mean_seed(0.5 * global_skill + 0.5 * within_skill)"
+  rule: exact_best

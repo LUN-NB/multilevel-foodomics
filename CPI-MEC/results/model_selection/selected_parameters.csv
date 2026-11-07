@@ -1,0 +1,2 @@
+scope,repeat,outer_fold,selected_candidate_id,selected_source,anchor_weight,graphban_weight,boltz_weight,selection_score_j,global_skill,within_skill,pooled_auprc,pairwise_logistic_loss,selection_rule
+full,1,,a0p0127142808688_g5p73735290612_b0p171256964785,continuous_tpe,0.012714280868783,5.737352906115883,0.1712569647848021,0.2193486024456847,0.19914588940722,0.2395513154841495,0.5536953176785508,0.527102861632681,exact maximum J across coarse winner and all completed continuous candidates

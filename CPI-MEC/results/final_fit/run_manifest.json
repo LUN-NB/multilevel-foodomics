@@ -1,0 +1,43 @@
+{
+  "created_utc": "2026-07-31T15:40:23.080846+00:00",
+  "module": "adaptive_final.py",
+  "module_version": "2.0.0",
+  "module_release": "full_label_final_20260728",
+  "protocol_version": "2.0.0",
+  "module_sha256": "97c8f81f2004ef1e99024a13ebaa985a9b05c169fc43a956bc9b417678fbd1e6",
+  "fit_scope": "all available binary CPI labels",
+  "validation_role": "Production Final matrix only; training-label metrics are not reported as validation performance.",
+  "selected_parameters_source": "CoBiDock-Landscape/reports/adaptive_pipeline_complete_gpu_trial_5x5/03_final_search/selected_parameters.csv",
+  "selected_parameters_sha256": "4b3ae2ccb02a6ac6af8288ea5fb0c9f03fbfddc2ca074a120bcfa28eca89a391",
+  "selected_parameters": {
+    "anchor_weight": 0.012714280868783,
+    "graphban_weight": 5.737352906115883,
+    "boltz_weight": 0.1712569647848021
+  },
+  "n_training_labels": 899,
+  "domain_shape": [
+    465,
+    7147
+  ],
+  "configured_base_seed": 20260716,
+  "final_seed_offset": 9000000,
+  "seed_offsets": [
+    0
+  ],
+  "backbone_epochs": 30,
+  "steps_per_epoch": 100,
+  "head_epochs": 120,
+  "dependencies": {
+    "adaptive_training.py": "8c3bfc9983c068eeab9dcf2162a8acc962019e197f82881cc60e0b2edb8b522c",
+    "adaptive_fixed_training.py": "80be247744d25c9bc3aed1d31faf3665ba2d3d20249369dc49093db8286bf2f7"
+  },
+  "base_config": "CoBiDock-Landscape/configs/tuning/adaptive_phase2_4gb.yaml",
+  "base_config_sha256": "14cf70b03fad9e322573f55b7d992090ea4055bedb08f9213090174d70d9b625",
+  "generated_config": "CoBiDock-Landscape/reports/adaptive_pipeline_complete_gpu_trial_5x5/04_final_matrix/experiment_config.yaml",
+  "outputs": {
+    "pre_z": "Final_full_label_fit_preZ_matrix.csv",
+    "row_z": "Final_full_label_fit_rowZ_matrix.csv",
+    "fit_summary": "final_fit_summary.csv",
+    "acceptance": "matrix_acceptance.csv"
+  }
+}

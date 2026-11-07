@@ -1,0 +1,13 @@
+method,outcome,feature,spearman_rho,p_value
+M0,compound_mean_score,HeavyAtomCount,-0.8095695014434042,3.5305840978894727e-109
+M0,compound_mean_score,MolLogP,-0.5227103649376218,5.782872725242774e-34
+M0,compound_mean_score,TPSA,-0.27018791668482106,3.1981491680415506e-09
+M0,compound_mean_score,RotatableBonds,-0.034091792212113795,0.4633235641751317
+M1,compound_mean_score,HeavyAtomCount,-0.8051015871322165,4.2984559729971154e-107
+M1,compound_mean_score,MolLogP,-0.5160440911336777,5.260451052136319e-33
+M1,compound_mean_score,TPSA,-0.27711411648039386,1.2091913024738251e-09
+M1,compound_mean_score,RotatableBonds,-0.04684451613231338,0.3134625553208626
+Final,compound_mean_score,HeavyAtomCount,-0.7800539821992142,2.498325325583069e-96
+Final,compound_mean_score,MolLogP,-0.46691056977321443,1.4895391592587085e-26
+Final,compound_mean_score,TPSA,-0.27300979241083384,2.1589165948579583e-09
+Final,compound_mean_score,RotatableBonds,-0.036433358142598654,0.43316365452225836
